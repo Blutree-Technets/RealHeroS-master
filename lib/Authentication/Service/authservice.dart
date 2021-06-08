@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/services.dart';
 import 'package:realheros_durga/Authentication/Views/login_page.dart';
+import 'package:realheros_durga/Authentication/error_handler.dart';
 import 'package:realheros_durga/Home/Home.dart';
 import 'package:realheros_durga/Others/ProgressDailog.dart';
 
@@ -25,26 +26,17 @@ class AuthService {
   }
 
   //Sign In
-  Future<void> signIn(String email, String password, context) async {
-    FirebaseAuth.instance
-        .signInWithEmailAndPassword(email: email, password: password)
-        .then((authResult) => Firestore.instance
-                .collection('DURGA')
-                .document(authResult.user.uid)
-                .get()
-                .then((val) {
-              print('signed in');
-              //Navigator.pop(context);
-              showDialog(
-                  barrierDismissible: false,
-                  context: context,
-                  builder: (BuildContext context) =>
-                      ProgressDialog('Logging you In'));
-            }).catchError((e) {
-              Navigator.pop(context);
-              PlatformException thisEx = e;
-              SnackBar(content: Text(thisEx.message));
-            }));
+  signIn(String email, String password, BuildContext context) async {
+    try {
+      var authResult = await FirebaseAuth.instance
+          .signInWithEmailAndPassword(email: email, password: password);
+      await Firestore.instance
+          .collection('DURGA')
+          .document(authResult.user.uid)
+          .get();
+    } catch (e) {
+      ErrorHandler().errorDialog(context, e);
+    }
   }
 
   //Signup a new user

@@ -1,9 +1,11 @@
-import 'package:connectivity/connectivity.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:realheros_durga/Authentication/Service/authservice.dart';
 import 'package:realheros_durga/Authentication/Views/reset.dart';
 import 'package:realheros_durga/Authentication/Views/signup.dart';
+import 'package:realheros_durga/Authentication/error_handler.dart';
 import 'package:realheros_durga/Others/Constants.dart';
 
 class LoginPage extends StatefulWidget {
@@ -79,10 +81,10 @@ class _LoginPageState extends State<LoginPage> {
                 stops: [0.1, 0.4, 0.7, 0.9],
               ),
             ),
-            child: Form(key: formKey, child: _buildLoginForm())));
+            child: Form(key: formKey, child: _buildLoginForm(context))));
   }
 
-  _buildLoginForm() {
+  _buildLoginForm(BuildContext context) {
     return Padding(
         padding: const EdgeInsets.only(left: 25.0, right: 25.0),
         child: ListView(children: [
@@ -226,16 +228,8 @@ class _LoginPageState extends State<LoginPage> {
           SizedBox(height: 50.0),
           GestureDetector(
               onTap: () async {
-                if (checkFields()) {
-                  AuthService().signIn(email, password, context);
-                  var connectivityResult =
-                      await Connectivity().checkConnectivity();
-                  if (connectivityResult != ConnectivityResult.mobile &&
-                      connectivityResult != ConnectivityResult.wifi) {
-                    SnackBar(content: Text("no internet connectivity"));
-                    return;
-                  }
-                }
+                if (checkFields())
+                  await AuthService().signIn(email, password, context);
               },
               child: Container(
                   height: 50.0,
