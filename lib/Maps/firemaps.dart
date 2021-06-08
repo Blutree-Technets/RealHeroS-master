@@ -1,13 +1,14 @@
+import 'dart:async';
+
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:geoflutterfire/geoflutterfire.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:location/location.dart';
-import 'package:geoflutterfire/geoflutterfire.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:realheros_durga/Maps/maps.dart';
-import 'dart:async';
 import 'package:rxdart/rxdart.dart';
-import 'package:geolocator/geolocator.dart';
 
 class Maps extends StatefulWidget {
   Maps({Key key, this.title, this.uid}) : super(key: key);
@@ -19,9 +20,9 @@ class Maps extends StatefulWidget {
 
 class _MapsState extends State<Maps> {
   GoogleMapController mapController;
-  FirebaseUser currentUser;
+  User currentUser;
   final FirebaseAuth auth = FirebaseAuth.instance;
-  Firestore firestore = Firestore.instance;
+  FirebaseFirestore firestore = FirebaseFirestore.instance;
   Geoflutterfire geo = Geoflutterfire();
   BehaviorSubject<double> radius = BehaviorSubject.seeded(100.0);
   Stream<dynamic> query;
@@ -64,9 +65,7 @@ class _MapsState extends State<Maps> {
   // ignore: unused_element
   void _onMapTypeButtonPressed() {
     setState(() {
-      _currentMapType = _currentMapType == MapType.normal
-          ? MapType.satellite
-          : MapType.normal;
+      _currentMapType = _currentMapType == MapType.normal ? MapType.satellite : MapType.normal;
     });
   }
 
@@ -85,10 +84,10 @@ class _MapsState extends State<Maps> {
   // }
 
   // void _updateMarkers2(List<DocumentSnapshot> documentList) {
-  //   documentList.forEach((DocumentSnapshot document) {
-  //     var data = document.data['name'];
-  //     GeoPoint pos = document.data['position']['geopoint'];
-  //     double distance = document.data['distance'];
+  //   documentList.forEach((DocumentSnapshot doc) {
+  //     var data = doc.data['name'];
+  //     GeoPoint pos = doc.data['position']['geopoint'];
+  //     double distance = doc.data['distance'];
   //     var marker = MarkerOptions(
   //       position: LatLng(pos.latitude, pos.longitude),
   //       icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueRed),
@@ -121,8 +120,7 @@ class _MapsState extends State<Maps> {
                     ? Center(
                         // Display Progress Indicator
                         child: CircularProgressIndicator(
-                          valueColor: new AlwaysStoppedAnimation<Color>(
-                              Colors.red[900]),
+                          valueColor: new AlwaysStoppedAnimation<Color>(Colors.red[900]),
                           backgroundColor: Colors.white,
                         ),
                       )
@@ -178,7 +176,7 @@ class _MapsState extends State<Maps> {
           )),
       onTap: () => Navigator.push(
         context,
-        MaterialPageRoute(builder: (context) => new userMaps()),
+        MaterialPageRoute(builder: (context) => new UserMaps()),
       ),
     ));
     //  ),
@@ -187,14 +185,14 @@ class _MapsState extends State<Maps> {
   }
 
   void _updateQuery(value) {
-    final zoomMap = {
-      100.0: 12.0,
-      200.0: 10.0,
-      300.0: 7.0,
-      400.0: 6.0,
-      500.0: 5.0,
-    };
-    final zoom = zoomMap[value];
+    // final zoomMap = {
+    //   100.0: 12.0,
+    //   200.0: 10.0,
+    //   300.0: 7.0,
+    //   400.0: 6.0,
+    //   500.0: 5.0,
+    // };
+    // final zoom = zoomMap[value];
     //mapController.moveCamera(CameraUpdate.zoomTo(zoom));
 
     setState(() {

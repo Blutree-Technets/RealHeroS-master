@@ -1,18 +1,17 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:location/location.dart';
 
-class userMaps extends StatefulWidget {
-  userMaps({Key key}) : super(key: key);
+class UserMaps extends StatefulWidget {
+  UserMaps({Key key}) : super(key: key);
 
   @override
-  _userMapsState createState() => _userMapsState();
+  _UserMapsState createState() => _UserMapsState();
 }
 
-class _userMapsState extends State<userMaps> {
+class _UserMapsState extends State<UserMaps> {
   Completer<GoogleMapController> _controller = Completer();
   MapType _currentMapType = MapType.normal;
   Location location = new Location();
@@ -36,9 +35,7 @@ class _userMapsState extends State<userMaps> {
 
   void _onMapTypeButtonPressed() {
     setState(() {
-      _currentMapType = _currentMapType == MapType.normal
-          ? MapType.satellite
-          : MapType.normal;
+      _currentMapType = _currentMapType == MapType.normal ? MapType.satellite : MapType.normal;
     });
   }
 
@@ -59,8 +56,7 @@ class _userMapsState extends State<userMaps> {
             _center == null
                 ? Center(
                     child: CircularProgressIndicator(
-                      valueColor:
-                          new AlwaysStoppedAnimation<Color>(Colors.red[900]),
+                      valueColor: new AlwaysStoppedAnimation<Color>(Colors.red[900]),
                       backgroundColor: Colors.white,
                     ),
                   )

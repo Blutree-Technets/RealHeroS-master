@@ -1,3 +1,5 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:realheros_durga/Authentication/Service/authservice.dart';
 import 'package:realheros_durga/Chat/Chat.dart';
@@ -7,8 +9,6 @@ import 'package:realheros_durga/Maps/safezone.dart';
 import 'package:realheros_durga/Others/About_Us.dart';
 import 'package:realheros_durga/Others/Durga_Info.dart';
 import 'package:realheros_durga/Profile/My_Profile.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 
 class AppDrawer extends StatefulWidget {
   final String uid;
@@ -21,7 +21,7 @@ class AppDrawer extends StatefulWidget {
 class _AppDrawerState extends State<AppDrawer> {
   String _userName;
   String _userEmail;
-  FirebaseUser user;
+  User user;
 
   @override
   void initState() {
@@ -30,14 +30,10 @@ class _AppDrawerState extends State<AppDrawer> {
   }
 
   Future<void> _getUserName() async {
-    Firestore.instance
-        .collection('DURGA')
-        .document((await FirebaseAuth.instance.currentUser()).uid)
-        .get()
-        .then((value) {
+    FirebaseFirestore.instance.collection('DURGA').doc(FirebaseAuth.instance.currentUser.uid).get().then((value) {
       setState(() {
-        _userName = value.data['fullname'].toString();
-        _userEmail = value.data['email'].toString();
+        _userName = value.data()['fullname'].toString();
+        _userEmail = value.data()['email'].toString();
       });
     });
   }
@@ -86,14 +82,14 @@ class _AppDrawerState extends State<AppDrawer> {
               text: 'Maps',
               onTap: () => Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (context) => new userMaps()),
+                    MaterialPageRoute(builder: (context) => new UserMaps()),
                   )),
           _createDrawerItem(
               icon: Icons.feedback,
               text: 'Chat',
               onTap: () => Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (context) => new chats()),
+                    MaterialPageRoute(builder: (context) => new Chats()),
                   )),
           _createDrawerItem(
               icon: Icons.perm_device_information,
@@ -211,8 +207,7 @@ class _AppDrawerState extends State<AppDrawer> {
     );
   }
 
-  Widget _createDrawerItem(
-      {IconData icon, String text, GestureTapCallback onTap}) {
+  Widget _createDrawerItem({IconData icon, String text, GestureTapCallback onTap}) {
     return ListTile(
       title: Row(
         children: <Widget>[

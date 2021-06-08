@@ -1,8 +1,9 @@
 import 'dart:async';
 import 'dart:io';
+
 import 'package:audioplayer/audioplayer.dart';
-import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:path_provider/path_provider.dart';
@@ -40,13 +41,9 @@ class _notifyState extends State<notify> {
   }
 
   Future<void> _notifyName() async {
-    Firestore.instance
-        .collection('locations')
-        .document()
-        .get()
-        .then((document) {
+    FirebaseFirestore.instance.collection('locations').doc().get().then((doc) {
       setState(() {
-        notName = document['name'];
+        notName = doc['name'];
       });
     });
   }
@@ -56,14 +53,12 @@ class _notifyState extends State<notify> {
     super.initState();
     // initialise the plugin. app_icon needs to be a added as a drawable resource to the Android head project
     // If you have skipped STEP 3 then change app_icon to @mipmap/ic_launcher
-    var initializationSettingsAndroid =
-        new AndroidInitializationSettings('app_icon');
+    var initializationSettingsAndroid = new AndroidInitializationSettings('app_icon');
     var initializationSettingsIOS = new IOSInitializationSettings();
-    var initializationSettings = new InitializationSettings(
-        initializationSettingsAndroid, initializationSettingsIOS);
+    var initializationSettings =
+        new InitializationSettings(android: initializationSettingsAndroid, iOS: initializationSettingsIOS);
     flutterLocalNotificationsPlugin = new FlutterLocalNotificationsPlugin();
-    flutterLocalNotificationsPlugin.initialize(initializationSettings,
-        onSelectNotification: onSelectNotification);
+    flutterLocalNotificationsPlugin.initialize(initializationSettings, onSelectNotification: onSelectNotification);
     _loadSound();
     _notifyName();
   }
@@ -111,62 +106,45 @@ class _notifyState extends State<notify> {
                     child: Container(
                         padding: const EdgeInsets.all(10.0),
                         child: StreamBuilder<QuerySnapshot>(
-                            stream: Firestore.instance
-                                .collection('locations')
-                                .snapshots(),
-                            builder: (BuildContext context,
-                                AsyncSnapshot<QuerySnapshot> snapshot) {
-                              if (snapshot.hasError)
-                                return new Text('Error: ${snapshot.error}');
+                            stream: FirebaseFirestore.instance.collection('locations').snapshots(),
+                            builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
+                              if (snapshot.hasError) return new Text('Error: ${snapshot.error}');
                               switch (snapshot.connectionState) {
                                 case ConnectionState.waiting:
                                   return new Text('Loading...');
                                 default:
                                   return new ListView(
-                                    children: snapshot.data.documents
-                                        .map((DocumentSnapshot document) {
+                                    children: snapshot.data.docs.map((DocumentSnapshot doc) {
                                       if (snapshot.hasData) {
                                         return Card(
                                             shape: RoundedRectangleBorder(
-                                              borderRadius:
-                                                  BorderRadius.circular(10.0),
+                                              borderRadius: BorderRadius.circular(10.0),
                                             ),
                                             shadowColor: Colors.white,
                                             color: Colors.white,
                                             child: Container(
                                                 height: 120.0,
                                                 width: 400.0,
-                                                padding:
-                                                    const EdgeInsets.fromLTRB(
-                                                        10, 0, 10, 0),
+                                                padding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
                                                 child: Column(
-                                                  crossAxisAlignment:
-                                                      CrossAxisAlignment.center,
-                                                  mainAxisAlignment:
-                                                      MainAxisAlignment.center,
+                                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                                  mainAxisAlignment: MainAxisAlignment.center,
                                                   children: <Widget>[
                                                     SizedBox(
                                                       height: 10.0,
                                                     ),
                                                     Text(
-                                                      document['name'],
-                                                      style: TextStyle(
-                                                          fontWeight:
-                                                              FontWeight.bold,
-                                                          fontSize: 20),
+                                                      doc['name'],
+                                                      style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
                                                     ),
                                                     Text(
                                                       'has requested your HELP!!!',
-                                                      style: TextStyle(
-                                                          fontSize: 18),
+                                                      style: TextStyle(fontSize: 18),
                                                     ),
                                                     // Text('$name'),
                                                     ButtonBar(
                                                       children: <Widget>[
-                                                        FlatButton(
-                                                            child: const Text(
-                                                                'Maps'),
-                                                            onPressed: () {}
+                                                        FlatButton(child: const Text('Maps'), onPressed: () {}
                                                             //   Navigator.push(
                                                             // context,
                                                             // MaterialPageRoute(
@@ -175,10 +153,8 @@ class _notifyState extends State<notify> {
                                                             //             new direction()),
                                                             ),
                                                         RaisedButton(
-                                                          child: const Text(
-                                                              'Accept'),
-                                                          onPressed:
-                                                              _showNotificationWithDefaultSound,
+                                                          child: const Text('Accept'),
+                                                          onPressed: _showNotificationWithDefaultSound,
                                                         ),
                                                       ],
                                                     ),
@@ -215,13 +191,16 @@ class _notifyState extends State<notify> {
 
   Future _showNotificationWithDefaultSound() async {
     var androidPlatformChannelSpecifics = new AndroidNotificationDetails(
-        'your channel id', 'your channel name', 'your channel description',
-        importance: Importance.Max,
-        priority: Priority.High,
-        sound: 'siren.mp3');
+      'your channel id',
+      'your channel name',
+      'your channel description',
+      importance: Importance.max,
+      priority: Priority.high,
+      sound: RawResourceAndroidNotificationSound('siren.mp3'),
+    );
     var iOSPlatformChannelSpecifics = new IOSNotificationDetails();
-    var platformChannelSpecifics = new NotificationDetails(
-        androidPlatformChannelSpecifics, iOSPlatformChannelSpecifics);
+    var platformChannelSpecifics =
+        new NotificationDetails(android: androidPlatformChannelSpecifics, iOS: iOSPlatformChannelSpecifics);
     await flutterLocalNotificationsPlugin.show(
       0,
       '$notName, has requested for your HELP!!!',

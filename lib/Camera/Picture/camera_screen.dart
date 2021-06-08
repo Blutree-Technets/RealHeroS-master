@@ -1,11 +1,12 @@
 import 'dart:io';
+
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:realheros_durga/Camera/Picture/gallery.dart';
-import 'package:realheros_durga/Camera/Video/video_timer.dart';
 import 'package:path/path.dart' as path;
 import 'package:path_provider/path_provider.dart';
+import 'package:realheros_durga/Camera/Picture/gallery.dart';
+import 'package:realheros_durga/Camera/Video/video_timer.dart';
 import 'package:thumbnails/thumbnails.dart';
 
 class CameraScreen extends StatefulWidget {
@@ -15,8 +16,7 @@ class CameraScreen extends StatefulWidget {
   CameraScreenState createState() => CameraScreenState();
 }
 
-class CameraScreenState extends State<CameraScreen>
-    with AutomaticKeepAliveClientMixin {
+class CameraScreenState extends State<CameraScreen> with AutomaticKeepAliveClientMixin {
   CameraController _controller;
   List<CameraDescription> _cameras;
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
@@ -213,15 +213,13 @@ class CameraScreenState extends State<CameraScreen>
     if (extension == '.jpeg') {
       return lastFile;
     } else {
-      String thumb = await Thumbnails.getThumbnail(
-          videoFile: lastFile.path, imageType: ThumbFormat.PNG, quality: 30);
+      String thumb = await Thumbnails.getThumbnail(videoFile: lastFile.path, imageType: ThumbFormat.PNG, quality: 30);
       return File(thumb);
     }
   }
 
   Future<void> _onCameraSwitch() async {
-    final CameraDescription cameraDescription =
-        (_controller.description == _cameras[0]) ? _cameras[1] : _cameras[0];
+    final CameraDescription cameraDescription = (_controller.description == _cameras[0]) ? _cameras[1] : _cameras[0];
     if (_controller != null) {
       await _controller.dispose();
     }
@@ -253,7 +251,7 @@ class CameraScreenState extends State<CameraScreen>
       await Directory(dirPath).create(recursive: true);
       final String filePath = '$dirPath/${_timestamp()}.jpeg';
       print('path: $filePath');
-      await _controller.takePicture(filePath);
+      await _controller.takePicture();
       setState(() {});
     }
   }
@@ -280,7 +278,7 @@ class CameraScreenState extends State<CameraScreen>
 
     try {
 //      videoPath = filePath;
-      await _controller.startVideoRecording(filePath);
+      await _controller.startVideoRecording();
     } on CameraException catch (e) {
       _showCameraException(e);
       return null;
@@ -317,8 +315,7 @@ class CameraScreenState extends State<CameraScreen>
     _scaffoldKey.currentState.showSnackBar(SnackBar(content: Text(message)));
   }
 
-  void logError(String code, String message) =>
-      print('Error: $code\nError Message: $message');
+  void logError(String code, String message) => print('Error: $code\nError Message: $message');
 
   @override
   bool get wantKeepAlive => true;

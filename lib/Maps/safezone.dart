@@ -1,11 +1,11 @@
-import 'package:flutter/material.dart';
-import 'package:realheros_durga/Drawer/Side_Drawer.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:realheros_durga/Others/Constants.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:geoflutterfire/geoflutterfire.dart';
 import 'package:location/location.dart';
-import 'package:firebase_auth/firebase_auth.dart';
+import 'package:realheros_durga/Drawer/Side_Drawer.dart';
+import 'package:realheros_durga/Others/Constants.dart';
 import 'package:realheros_durga/Others/Custom_Card.dart';
 
 // ignore: camel_case_types
@@ -23,7 +23,7 @@ class safezone extends StatefulWidget {
 class _safezoneState extends State<safezone> {
   static Location location = new Location();
   // ignore: unused_field
-  static Firestore firestore = Firestore.instance;
+  static FirebaseFirestore firestore = FirebaseFirestore.instance;
   static Geoflutterfire geo = Geoflutterfire();
   bool isScrollingDown = true;
 
@@ -33,7 +33,7 @@ class _safezoneState extends State<safezone> {
   TextEditingController taskAgeInputController;
   TextEditingController taskGenderInputController;
   TextEditingController taskAddressInputController;
-  FirebaseUser currentUser;
+  User currentUser;
   final FirebaseAuth auth = FirebaseAuth.instance;
 
   @override
@@ -50,18 +50,17 @@ class _safezoneState extends State<safezone> {
   }
 
   Future<dynamic> getCurrentUser() async {
-    currentUser = await FirebaseAuth.instance.currentUser();
+    currentUser = FirebaseAuth.instance.currentUser;
   }
 
   // ignore: missing_return
   Future<DocumentReference> _sendLocation() async {
     var pos = await location.getLocation();
-    GeoFirePoint point =
-        geo.point(latitude: pos.latitude, longitude: pos.longitude);
-    Firestore.instance.collection('SafeZoneLocation').document(currentUser.uid)
+    GeoFirePoint point = geo.point(latitude: pos.latitude, longitude: pos.longitude);
+    FirebaseFirestore.instance.collection('SafeZoneLocation').doc(currentUser.uid)
         // .collection("Location")
-        // .document(currentUser.uid)
-        .setData({'position': point.data, 'name': 'SafeZone'});
+        // .doc(currentUser.uid)
+        .set({'position': point.data, 'name': 'SafeZone'});
   }
 
   @override
@@ -128,245 +127,108 @@ class _safezoneState extends State<safezone> {
   }
 
   Widget _volName() {
-    return Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: <Widget>[
-          //SizedBox(height: 10.0),
-          Text(
-            'Volunteer\'s Name',
-            style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
-          ),
-          SizedBox(height: 10.0),
-          Container(
-            alignment: Alignment.centerLeft,
-            decoration: kBoxDecorationStyle,
-            height: 60.0,
-            width: 330,
-            child: TextFormField(
-                autofocus: true,
-                controller: taskVolNameInputController,
-                keyboardType: TextInputType.name,
-                style: TextStyle(
-                  color: Colors.black,
-                  fontFamily: 'OpenSans',
-                ),
-                decoration: InputDecoration(
-                  border: InputBorder.none,
-                  contentPadding: EdgeInsets.only(top: 14.0),
-                  prefixIcon: Icon(
-                    Icons.edit,
-                    color: Colors.white,
-                  ),
-                  // labelText: 'Name',
-                  hintText: "Enter Volunteer's Name",
-                  hintStyle: kHintTextStyle,
-                ),
-                // ignore: missing_return
-                validator: (value) {
-                  if (value.length < 3) {
-                    return "Please enter a valid name.";
-                  }
-                }),
-          ),
-        ]);
+    return Column(crossAxisAlignment: CrossAxisAlignment.start, children: <Widget>[
+      //SizedBox(height: 10.0),
+      Text(
+        'Volunteer\'s Name',
+        style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+      ),
+      SizedBox(height: 10.0),
+      Container(
+        alignment: Alignment.centerLeft,
+        decoration: kBoxDecorationStyle,
+        height: 60.0,
+        width: 330,
+        child: TextFormField(
+            autofocus: true,
+            controller: taskVolNameInputController,
+            keyboardType: TextInputType.name,
+            style: TextStyle(
+              color: Colors.black,
+              fontFamily: 'OpenSans',
+            ),
+            decoration: InputDecoration(
+              border: InputBorder.none,
+              contentPadding: EdgeInsets.only(top: 14.0),
+              prefixIcon: Icon(
+                Icons.edit,
+                color: Colors.white,
+              ),
+              // labelText: 'Name',
+              hintText: "Enter Volunteer's Name",
+              hintStyle: kHintTextStyle,
+            ),
+            // ignore: missing_return
+            validator: (value) {
+              if (value.length < 3) {
+                return "Please enter a valid name.";
+              }
+            }),
+      ),
+    ]);
   }
 
   // ignore: missing_return
   Widget _fullName() {
-    return Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: <Widget>[
-          SizedBox(height: 10.0),
-          Text(
-            'Name',
-            style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
-          ),
-          SizedBox(height: 10.0),
-          Container(
-            alignment: Alignment.centerLeft,
-            decoration: kBoxDecorationStyle,
-            height: 60.0,
-            width: 330,
-            child: TextFormField(
-                autofocus: true,
-                controller: taskNameInputController,
-                keyboardType: TextInputType.name,
-                style: TextStyle(
-                  color: Colors.black,
-                  fontFamily: 'OpenSans',
-                ),
-                decoration: InputDecoration(
-                  border: InputBorder.none,
-                  contentPadding: EdgeInsets.only(top: 14.0),
-                  prefixIcon: Icon(
-                    Icons.edit,
-                    color: Colors.white,
-                  ),
-                  // labelText: 'Name',
-                  hintText: "Enter Name",
-                  hintStyle: kHintTextStyle,
-                ),
-                // ignore: missing_return
-                validator: (value) {
-                  if (value.length < 3) {
-                    return "Please enter a valid name.";
-                  }
-                }),
-          ),
-        ]);
+    return Column(crossAxisAlignment: CrossAxisAlignment.start, children: <Widget>[
+      SizedBox(height: 10.0),
+      Text(
+        'Name',
+        style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+      ),
+      SizedBox(height: 10.0),
+      Container(
+        alignment: Alignment.centerLeft,
+        decoration: kBoxDecorationStyle,
+        height: 60.0,
+        width: 330,
+        child: TextFormField(
+            autofocus: true,
+            controller: taskNameInputController,
+            keyboardType: TextInputType.name,
+            style: TextStyle(
+              color: Colors.black,
+              fontFamily: 'OpenSans',
+            ),
+            decoration: InputDecoration(
+              border: InputBorder.none,
+              contentPadding: EdgeInsets.only(top: 14.0),
+              prefixIcon: Icon(
+                Icons.edit,
+                color: Colors.white,
+              ),
+              // labelText: 'Name',
+              hintText: "Enter Name",
+              hintStyle: kHintTextStyle,
+            ),
+            // ignore: missing_return
+            validator: (value) {
+              if (value.length < 3) {
+                return "Please enter a valid name.";
+              }
+            }),
+      ),
+    ]);
   }
 
   // ignore: missing_return
   Widget _askNum() {
-    return Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: <Widget>[
-          SizedBox(height: 10.0),
-          Text(
-            'Number',
-            style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
-          ),
-          SizedBox(height: 10.0),
-          Container(
-              alignment: Alignment.centerLeft,
-              decoration: kBoxDecorationStyle,
-              height: 60.0,
-              width: 330,
-              child: TextFormField(
-                  autofocus: true,
-                  controller: taskNumberInputController,
-                  keyboardType: TextInputType.number,
-                  style: TextStyle(
-                    color: Colors.black,
-                    fontFamily: 'OpenSans',
-                  ),
-                  decoration: InputDecoration(
-                    border: InputBorder.none,
-                    contentPadding: EdgeInsets.only(top: 14.0),
-                    prefixIcon: Icon(
-                      Icons.edit,
-                      color: Colors.white,
-                    ),
-                    // labelText: 'First Name',
-                    hintText: "Enter Contact Number",
-                    hintStyle: kHintTextStyle,
-                  ),
-                  // ignore: missing_return
-                  validator: (value) {
-                    if (value.length < 10) {
-                      return "Please enter a valid number.";
-                    }
-                  })),
-        ]);
-  }
-
-  Widget _askAge() {
-    return Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: <Widget>[
-          SizedBox(height: 10.0),
-          Text(
-            'Age',
-            style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
-          ),
-          SizedBox(height: 10.0),
-          Container(
-            alignment: Alignment.centerLeft,
-            decoration: kBoxDecorationStyle,
-            height: 60.0,
-            width: 330,
-            child: TextFormField(
-                autofocus: true,
-                controller: taskAgeInputController,
-                keyboardType: TextInputType.number,
-                style: TextStyle(
-                  color: Colors.black,
-                  fontFamily: 'OpenSans',
-                ),
-                decoration: InputDecoration(
-                  border: InputBorder.none,
-                  contentPadding: EdgeInsets.only(top: 14.0),
-                  prefixIcon: Icon(
-                    Icons.edit,
-                    color: Colors.white,
-                  ),
-                  // labelText: 'First Name',
-                  hintText: "Enter Age",
-                  hintStyle: kHintTextStyle,
-                ),
-                // ignore: missing_return
-                validator: (value) {
-                  if (value.length < 10) {
-                    return "Please enter the correct Age.";
-                  }
-                }),
-          ),
-        ]);
-  }
-
-  Widget _askGender() {
-    return Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: <Widget>[
-          SizedBox(height: 10.0),
-          Text(
-            'Gender',
-            style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
-          ),
-          SizedBox(height: 10.0),
-          Container(
-            alignment: Alignment.centerLeft,
-            decoration: kBoxDecorationStyle,
-            height: 60.0,
-            width: 330,
-            child: TextFormField(
-                autofocus: true,
-                controller: taskGenderInputController,
-                keyboardType: TextInputType.name,
-                style: TextStyle(
-                  color: Colors.black,
-                  fontFamily: 'OpenSans',
-                ),
-                decoration: InputDecoration(
-                  border: InputBorder.none,
-                  contentPadding: EdgeInsets.only(top: 14.0),
-                  prefixIcon: Icon(
-                    Icons.edit,
-                    color: Colors.white,
-                  ),
-                  // labelText: 'Name',
-                  hintText: "Enter Gender",
-                  hintStyle: kHintTextStyle,
-                ),
-                // ignore: missing_return
-                validator: (value) {
-                  if (value.length < 3) {
-                    return "Please enter a correct Gender.";
-                  }
-                }),
-          )
-        ]);
-  }
-
-  Widget _askAddress() {
-    return Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: <Widget>[
-          SizedBox(height: 10.0),
-          Text(
-            'Address',
-            style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
-          ),
-          SizedBox(height: 10.0),
-          Container(
-            alignment: Alignment.centerLeft,
-            decoration: kBoxDecorationStyle,
-            height: 60.0,
-            width: 330,
-            child: TextFormField(
+    return Column(crossAxisAlignment: CrossAxisAlignment.start, children: <Widget>[
+      SizedBox(height: 10.0),
+      Text(
+        'Number',
+        style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+      ),
+      SizedBox(height: 10.0),
+      Container(
+          alignment: Alignment.centerLeft,
+          decoration: kBoxDecorationStyle,
+          height: 60.0,
+          width: 330,
+          child: TextFormField(
               autofocus: true,
-              controller: taskAddressInputController,
-              keyboardType: TextInputType.streetAddress,
+              controller: taskNumberInputController,
+              keyboardType: TextInputType.number,
               style: TextStyle(
                 color: Colors.black,
                 fontFamily: 'OpenSans',
@@ -379,94 +241,212 @@ class _safezoneState extends State<safezone> {
                   color: Colors.white,
                 ),
                 // labelText: 'First Name',
-                hintText: "Enter Address",
+                hintText: "Enter Contact Number",
                 hintStyle: kHintTextStyle,
               ),
-              // controller: lastNameInputController,
               // ignore: missing_return
               validator: (value) {
-                if (value.length < 30) {
-                  return "Please enter a valid Adress.";
+                if (value.length < 10) {
+                  return "Please enter a valid number.";
                 }
-              },
+              })),
+    ]);
+  }
+
+  Widget _askAge() {
+    return Column(crossAxisAlignment: CrossAxisAlignment.start, children: <Widget>[
+      SizedBox(height: 10.0),
+      Text(
+        'Age',
+        style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+      ),
+      SizedBox(height: 10.0),
+      Container(
+        alignment: Alignment.centerLeft,
+        decoration: kBoxDecorationStyle,
+        height: 60.0,
+        width: 330,
+        child: TextFormField(
+            autofocus: true,
+            controller: taskAgeInputController,
+            keyboardType: TextInputType.number,
+            style: TextStyle(
+              color: Colors.black,
+              fontFamily: 'OpenSans',
             ),
-          )
-        ]);
+            decoration: InputDecoration(
+              border: InputBorder.none,
+              contentPadding: EdgeInsets.only(top: 14.0),
+              prefixIcon: Icon(
+                Icons.edit,
+                color: Colors.white,
+              ),
+              // labelText: 'First Name',
+              hintText: "Enter Age",
+              hintStyle: kHintTextStyle,
+            ),
+            // ignore: missing_return
+            validator: (value) {
+              if (value.length < 10) {
+                return "Please enter the correct Age.";
+              }
+            }),
+      ),
+    ]);
+  }
+
+  Widget _askGender() {
+    return Column(crossAxisAlignment: CrossAxisAlignment.start, children: <Widget>[
+      SizedBox(height: 10.0),
+      Text(
+        'Gender',
+        style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+      ),
+      SizedBox(height: 10.0),
+      Container(
+        alignment: Alignment.centerLeft,
+        decoration: kBoxDecorationStyle,
+        height: 60.0,
+        width: 330,
+        child: TextFormField(
+            autofocus: true,
+            controller: taskGenderInputController,
+            keyboardType: TextInputType.name,
+            style: TextStyle(
+              color: Colors.black,
+              fontFamily: 'OpenSans',
+            ),
+            decoration: InputDecoration(
+              border: InputBorder.none,
+              contentPadding: EdgeInsets.only(top: 14.0),
+              prefixIcon: Icon(
+                Icons.edit,
+                color: Colors.white,
+              ),
+              // labelText: 'Name',
+              hintText: "Enter Gender",
+              hintStyle: kHintTextStyle,
+            ),
+            // ignore: missing_return
+            validator: (value) {
+              if (value.length < 3) {
+                return "Please enter a correct Gender.";
+              }
+            }),
+      )
+    ]);
+  }
+
+  Widget _askAddress() {
+    return Column(crossAxisAlignment: CrossAxisAlignment.start, children: <Widget>[
+      SizedBox(height: 10.0),
+      Text(
+        'Address',
+        style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+      ),
+      SizedBox(height: 10.0),
+      Container(
+        alignment: Alignment.centerLeft,
+        decoration: kBoxDecorationStyle,
+        height: 60.0,
+        width: 330,
+        child: TextFormField(
+          autofocus: true,
+          controller: taskAddressInputController,
+          keyboardType: TextInputType.streetAddress,
+          style: TextStyle(
+            color: Colors.black,
+            fontFamily: 'OpenSans',
+          ),
+          decoration: InputDecoration(
+            border: InputBorder.none,
+            contentPadding: EdgeInsets.only(top: 14.0),
+            prefixIcon: Icon(
+              Icons.edit,
+              color: Colors.white,
+            ),
+            // labelText: 'First Name',
+            hintText: "Enter Address",
+            hintStyle: kHintTextStyle,
+          ),
+          // controller: lastNameInputController,
+          // ignore: missing_return
+          validator: (value) {
+            if (value.length < 30) {
+              return "Please enter a valid Adress.";
+            }
+          },
+        ),
+      )
+    ]);
   }
 
   // ignore: missing_return
   Widget _buildCancel() {
-    return Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: <Widget>[
-          SizedBox(height: 35.0),
-          Row(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                RaisedButton(
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(20.0),
-                    ),
-                    color: Colors.grey[300],
-                    padding: EdgeInsets.fromLTRB(45, 15, 45, 15),
-                    child: Text('Cancel'),
-                    onPressed: () {
-                      taskVolNameInputController.clear();
-                      taskNameInputController.clear();
-                      taskNumberInputController.clear();
-                      taskAgeInputController.clear();
-                      taskGenderInputController.clear();
-                      taskAddressInputController.clear();
-                      Navigator.pop(context);
-                    })
-              ])
-        ]);
+    return Column(crossAxisAlignment: CrossAxisAlignment.start, children: <Widget>[
+      SizedBox(height: 35.0),
+      Row(crossAxisAlignment: CrossAxisAlignment.center, mainAxisAlignment: MainAxisAlignment.center, children: [
+        RaisedButton(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(20.0),
+            ),
+            color: Colors.grey[300],
+            padding: EdgeInsets.fromLTRB(45, 15, 45, 15),
+            child: Text('Cancel'),
+            onPressed: () {
+              taskVolNameInputController.clear();
+              taskNameInputController.clear();
+              taskNumberInputController.clear();
+              taskAgeInputController.clear();
+              taskGenderInputController.clear();
+              taskAddressInputController.clear();
+              Navigator.pop(context);
+            })
+      ])
+    ]);
   }
 
   // ignore: missing_return
   Widget _buildSave() {
-    return Column(
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: <Widget>[
-          SizedBox(width: 40.0),
-          RaisedButton(
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(20.0),
-              ),
-              color: Colors.grey[300],
-              padding: const EdgeInsets.fromLTRB(50, 15, 50, 15),
-              child: Text('Save'),
-              onPressed: () {
-                if (taskNameInputController.text.isNotEmpty &&
-                    (taskNumberInputController.text.isNotEmpty) &&
-                    (taskAddressInputController.text.isNotEmpty)) {
-                  Firestore.instance
-                      .collection("SafeZone")
-                      .document(currentUser.uid)
-                      .collection('Contact Details')
-                      .document(currentUser.uid)
-                      .setData({
-                        "Volunteer's Name": taskVolNameInputController.text,
-                        "Name": taskNameInputController.text,
-                        "Number": taskNumberInputController.text,
-                        "Age": taskAgeInputController.text,
-                        "Gender": taskGenderInputController.text,
-                        "Address": taskAddressInputController.text,
+    return Column(crossAxisAlignment: CrossAxisAlignment.center, children: <Widget>[
+      SizedBox(width: 40.0),
+      RaisedButton(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20.0),
+          ),
+          color: Colors.grey[300],
+          padding: const EdgeInsets.fromLTRB(50, 15, 50, 15),
+          child: Text('Save'),
+          onPressed: () {
+            if (taskNameInputController.text.isNotEmpty &&
+                (taskNumberInputController.text.isNotEmpty) &&
+                (taskAddressInputController.text.isNotEmpty)) {
+              FirebaseFirestore.instance
+                  .collection("SafeZone")
+                  .doc(currentUser.uid)
+                  .collection('Contact Details')
+                  .doc(currentUser.uid)
+                  .set({
+                    "Volunteer's Name": taskVolNameInputController.text,
+                    "Name": taskNameInputController.text,
+                    "Number": taskNumberInputController.text,
+                    "Age": taskAgeInputController.text,
+                    "Gender": taskGenderInputController.text,
+                    "Address": taskAddressInputController.text,
+                  })
+                  .whenComplete(() => {
+                        Navigator.pop(context),
+                        taskVolNameInputController.clear(),
+                        taskNameInputController.clear(),
+                        taskNumberInputController.clear(),
+                        taskAgeInputController.clear(),
+                        taskGenderInputController.clear(),
+                        taskAddressInputController.clear(),
                       })
-                      .whenComplete(() => {
-                            Navigator.pop(context),
-                            taskVolNameInputController.clear(),
-                            taskNameInputController.clear(),
-                            taskNumberInputController.clear(),
-                            taskAgeInputController.clear(),
-                            taskGenderInputController.clear(),
-                            taskAddressInputController.clear(),
-                          })
-                      .catchError((err) => print(err));
-                }
-              })
-        ]);
+                  .catchError((err) => print(err));
+            }
+          })
+    ]);
   }
 }
 
@@ -504,21 +484,18 @@ Widget _mysafezone() {
             Container(
                 padding: const EdgeInsets.all(10.0),
                 child: StreamBuilder<QuerySnapshot>(
-                  stream: Firestore.instance.collection('tasks').snapshots(),
-                  builder: (BuildContext context,
-                      AsyncSnapshot<QuerySnapshot> snapshot) {
-                    if (snapshot.hasError)
-                      return new Text('Error: ${snapshot.error}');
+                  stream: FirebaseFirestore.instance.collection('tasks').snapshots(),
+                  builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
+                    if (snapshot.hasError) return new Text('Error: ${snapshot.error}');
                     switch (snapshot.connectionState) {
                       case ConnectionState.waiting:
                         return new Text('Loading...');
                       default:
                         return new ListView(
-                          children: snapshot.data.documents
-                              .map((DocumentSnapshot document) {
+                          children: snapshot.data.docs.map((DocumentSnapshot doc) {
                             return new CustomCard(
-                              Name: document['Name'],
-                              Number: document['Number'],
+                              Name: doc['Name'],
+                              Number: doc['Number'],
                             );
                           }).toList(),
                         );
@@ -531,7 +508,7 @@ Widget _mysafezone() {
 //             style: kLabelStyle,
 //           ),
 //            StreamBuilder<QuerySnapshot>(
-//             stream: Firestore.instance.collection('tasks')
+//             stream: FirebaseFirestore.instance.collection('tasks')
 //               .snapshots(),
 //             builder: (BuildContext context,
 //               AsyncSnapshot<QuerySnapshot> snapshot) {
@@ -542,12 +519,12 @@ Widget _mysafezone() {
 //                     return new Text('Loading...');
 //                   default:
 //                     return new ListView(
-//                       children: snapshot.data.documents
-//                         .map((DocumentSnapshot document) {
+//                       children: snapshot.data.docs
+//                         .map((DocumentSnapshot doc) {
 //                           return new CustomCard(
-//                             Name: document['Name'],
-//                             Number: document['Number'],
-//                             Address: document['Address'],
+//                             Name: doc['Name'],
+//                             Number: doc['Number'],
+//                             Address: doc['Address'],
 //                           );
 //                       }).toList(),
 //                     );
@@ -556,7 +533,7 @@ Widget _mysafezone() {
 //           //   decoration: kBoxDecorationStyle,
 //           //   height: 60.0,
 //           //   child: StreamBuilder<QuerySnapshot>(
-//           //   stream: Firestore.instance.collection('safe_zones')
+//           //   stream: FirebaseFirestore.instance.collection('safe_zones')
 //           //     .snapshots(),
 //           //   builder: (BuildContext context,
 //           //     AsyncSnapshot<QuerySnapshot> snapshot) {
@@ -567,12 +544,12 @@ Widget _mysafezone() {
 //           //           return new Text('Loading...');
 //           //         default:
 //           //           return new ListView(
-//           //             children: snapshot.data.documents
-//           //               .map((DocumentSnapshot document) {
+//           //             children: snapshot.data.docs
+//           //               .map((DocumentSnapshot doc) {
 //           //             return new CustomCard(
-//           //               Name: document['Name'],
-//           //               Number: document['Number'],
-//           //               Address: document['Address'],
+//           //               Name: doc['Name'],
+//           //               Number: doc['Number'],
+//           //               Address: doc['Address'],
 //           //             );
 //           //             }).toList(),
 //           //           );

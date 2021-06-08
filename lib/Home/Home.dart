@@ -2,7 +2,6 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:geoflutterfire/geoflutterfire.dart';
 import 'package:location/location.dart';
-
 import 'package:realheros_durga/Drawer/Bottom_Drawer.dart';
 
 // ignore: camel_case_types
@@ -18,7 +17,7 @@ class wsd extends StatelessWidget {
   final String userId;
 
   static Location location = new Location();
-  static Firestore firestore = Firestore.instance;
+  static FirebaseFirestore firestore = FirebaseFirestore.instance;
   static Geoflutterfire geo = Geoflutterfire();
   @override
   Widget build(BuildContext context) {

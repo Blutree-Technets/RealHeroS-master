@@ -1,11 +1,8 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:realheros_durga/Authentication/Service/authservice.dart';
 import 'package:realheros_durga/Authentication/Views/reset.dart';
 import 'package:realheros_durga/Authentication/Views/signup.dart';
-import 'package:realheros_durga/Authentication/error_handler.dart';
 import 'package:realheros_durga/Others/Constants.dart';
 
 class LoginPage extends StatefulWidget {
@@ -22,7 +19,7 @@ class _LoginPageState extends State<LoginPage> {
 
   String token = '';
 
-  final FirebaseMessaging firebaseMessaging = FirebaseMessaging();
+  final FirebaseMessaging firebaseMessaging = FirebaseMessaging.instance;
 
   //To check fields during submit
   checkFields() {
@@ -116,18 +113,14 @@ class _LoginPageState extends State<LoginPage> {
                       top: 105.0,
                       child: Text('RealHeroS',
                           style: TextStyle(
-                              fontFamily: 'Trueno',
-                              fontSize: 40.0,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.white))),
+                              fontFamily: 'Trueno', fontSize: 40.0, fontWeight: FontWeight.bold, color: Colors.white))),
                   Positioned(
                       top: 135.0,
                       left: 190.0,
                       child: Container(
                           height: 10.0,
                           width: 10.0,
-                          decoration: BoxDecoration(
-                              shape: BoxShape.circle, color: Colors.black)))
+                          decoration: BoxDecoration(shape: BoxShape.circle, color: Colors.black)))
                 ],
               )),
           SizedBox(height: 20.0),
@@ -158,8 +151,7 @@ class _LoginPageState extends State<LoginPage> {
                 onChanged: (value) {
                   this.email = value;
                 },
-                validator: (value) =>
-                    value.isEmpty ? 'Email is required' : validateEmail(value)),
+                validator: (value) => value.isEmpty ? 'Email is required' : validateEmail(value)),
           ),
           SizedBox(height: 20.0),
           Text(
@@ -202,16 +194,14 @@ class _LoginPageState extends State<LoginPage> {
               onChanged: (value) {
                 this.password = value;
               },
-              validator: (value) =>
-                  value.isEmpty ? 'Password is required' : validatePswd(value),
+              validator: (value) => value.isEmpty ? 'Password is required' : validatePswd(value),
               cursorColor: Colors.white,
             ),
           ),
           SizedBox(height: 5.0),
           GestureDetector(
               onTap: () {
-                Navigator.of(context).push(
-                    MaterialPageRoute(builder: (context) => ResetPassword()));
+                Navigator.of(context).push(MaterialPageRoute(builder: (context) => ResetPassword()));
               },
               child: Container(
                   alignment: Alignment(1.0, 0.0),
@@ -228,8 +218,7 @@ class _LoginPageState extends State<LoginPage> {
           SizedBox(height: 50.0),
           GestureDetector(
               onTap: () async {
-                if (checkFields())
-                  await AuthService().signIn(email, password, context);
+                if (checkFields()) await AuthService().signIn(email, password, context);
               },
               child: Container(
                   height: 50.0,
@@ -264,8 +253,7 @@ class _LoginPageState extends State<LoginPage> {
             SizedBox(height: 5.0),
             InkWell(
                 onTap: () {
-                  Navigator.of(context).push(
-                      MaterialPageRoute(builder: (context) => SignupPage()));
+                  Navigator.of(context).push(MaterialPageRoute(builder: (context) => SignupPage()));
                 },
                 child: Text('Register',
                     style: TextStyle(
@@ -276,8 +264,7 @@ class _LoginPageState extends State<LoginPage> {
             SizedBox(height: 100.0),
             InkWell(
                 onTap: () {
-                  Navigator.of(context).push(
-                      MaterialPageRoute(builder: (context) => SignupPage()));
+                  Navigator.of(context).push(MaterialPageRoute(builder: (context) => SignupPage()));
                 },
                 child: Text('| Terms & Conditions |',
                     style: TextStyle(

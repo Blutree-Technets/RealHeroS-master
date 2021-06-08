@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:realheros_durga/Drawer/Side_Drawer.dart';
 
-class chats extends StatelessWidget {
+class Chats extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(

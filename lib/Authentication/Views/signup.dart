@@ -18,7 +18,7 @@ class _SignupPageState extends State<SignupPage> {
 
   String token = '';
 
-  final FirebaseMessaging firebaseMessaging = FirebaseMessaging();
+  final FirebaseMessaging firebaseMessaging = FirebaseMessaging.instance;
 
   Color greenColor = Color(0xFF00AF19);
 

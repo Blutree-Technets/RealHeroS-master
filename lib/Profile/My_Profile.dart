@@ -1,13 +1,11 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_phone_direct_caller/flutter_phone_direct_caller.dart';
 import 'package:realheros_durga/Drawer/Side_Drawer.dart';
 import 'package:realheros_durga/Others/Constants.dart';
 import 'package:realheros_durga/Others/Custom_Card.dart';
-
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-
-import 'package:flutter/services.dart';
 
 class ContactInfooId extends StatefulWidget {
   ContactInfooId({
@@ -27,7 +25,7 @@ class _ContactInfooIdState extends State<ContactInfooId> {
   TextEditingController taskNumberInputController;
   TextEditingController taskAddressInputController;
 
-  FirebaseUser currentUser;
+  User currentUser;
   final FirebaseAuth auth = FirebaseAuth.instance;
 
   String userName;
@@ -46,19 +44,15 @@ class _ContactInfooIdState extends State<ContactInfooId> {
   }
 
   Future getCurrentUser() async {
-    currentUser = await FirebaseAuth.instance.currentUser();
+    currentUser = FirebaseAuth.instance.currentUser;
     return currentUser != null ? currentUser.uid : CircularProgressIndicator();
   }
 
   Future<void> _getUserName1() async {
-    Firestore.instance
-        .collection('DURGA')
-        .document((await FirebaseAuth.instance.currentUser()).uid)
-        .get()
-        .then((value) {
+    FirebaseFirestore.instance.collection('DURGA').doc(FirebaseAuth.instance.currentUser.uid).get().then((value) {
       setState(() {
-        userName = value.data['fullname'].toString();
-        userEmail = value.data['email'].toString();
+        userName = value.data()['fullname'].toString();
+        userEmail = value.data()['email'].toString();
       });
     });
   }
@@ -148,8 +142,7 @@ class _ContactInfooIdState extends State<ContactInfooId> {
                       // Display Progress Indicator
                       child: CircularProgressIndicator(
                         backgroundColor: Colors.red[900],
-                        valueColor:
-                            new AlwaysStoppedAnimation<Color>(Colors.red[900]),
+                        valueColor: new AlwaysStoppedAnimation<Color>(Colors.red[900]),
                       ),
                     )
                   : Text(
@@ -166,8 +159,7 @@ class _ContactInfooIdState extends State<ContactInfooId> {
                   ? Center(
                       // Display Progress Indicator
                       child: CircularProgressIndicator(
-                        valueColor:
-                            new AlwaysStoppedAnimation<Color>(Colors.red[900]),
+                        valueColor: new AlwaysStoppedAnimation<Color>(Colors.red[900]),
                         backgroundColor: Colors.red[900],
                         // Animation<Color>: Colors.red[900],
                       ),
@@ -194,30 +186,27 @@ class _ContactInfooIdState extends State<ContactInfooId> {
           //color: Colors.white,
           padding: const EdgeInsets.all(10.0),
           child: StreamBuilder<QuerySnapshot>(
-              stream: Firestore.instance
+              stream: FirebaseFirestore.instance
                   .collection('DURGA')
-                  .document(currentUser.uid)
+                  .doc(currentUser.uid)
                   .collection('Emergency Contacts')
                   .snapshots(),
-              builder: (BuildContext context,
-                  AsyncSnapshot<QuerySnapshot> snapshot) {
-                if (snapshot.hasError)
-                  return new Text('Error: ${snapshot.error}');
+              builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
+                if (snapshot.hasError) return new Text('Error: ${snapshot.error}');
                 switch (snapshot.connectionState) {
                   case ConnectionState.waiting:
                     return new Text('Loading...');
                   default:
                     return new ListView(
-                      children: snapshot.data.documents
-                          .map((DocumentSnapshot document) {
+                      children: snapshot.data.docs.map((DocumentSnapshot doc) {
                         if (snapshot.hasData)
                           //_showNotificationWithDefaultSound();
 
                           return Column(children: <Widget>[
                             new CustomCard(
-                              Name: document['Name'],
-                              Number: document['Number'],
-                              Address: document['Address'],
+                              Name: doc['Name'],
+                              Number: doc['Number'],
+                              Address: doc['Address'],
                             ),
                             ButtonBar(
                               children: <Widget>[
@@ -231,8 +220,7 @@ class _ContactInfooIdState extends State<ContactInfooId> {
                                       style: TextStyle(color: Colors.black),
                                     ),
                                     onPressed: () async {
-                                      FlutterPhoneDirectCaller.callNumber(
-                                          document['Number']);
+                                      FlutterPhoneDirectCaller.callNumber(doc['Number']);
                                     }),
                               ],
                             )
@@ -407,60 +395,55 @@ class _ContactInfooIdState extends State<ContactInfooId> {
               ),
             ),
             SizedBox(height: 20.0),
-            Row(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  RaisedButton(
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(30.0),
-                      ),
-                      color: Colors.amber[700],
-                      padding: const EdgeInsets.all(20),
-                      child: Text('Cancel'),
-                      onPressed: () {
-                        taskNameInputController.clear();
-                        taskNumberInputController.clear();
-                        taskAddressInputController.clear();
-                        Navigator.pop(context);
-                      }),
-                  SizedBox(width: 80.0),
-                  RaisedButton(
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(30.0),
-                      ),
-                      color: Colors.amber[700],
-                      padding: const EdgeInsets.all(20),
-                      child: Text(
-                        'Save',
-                        //style: TextStyle(color: Colors.red[900]),
-                      ),
-                      onPressed: () async {
-                        if (taskNameInputController.text.isNotEmpty &&
-                            (taskNumberInputController.text.isNotEmpty) &&
-                            (taskAddressInputController.text.isNotEmpty)) {
-                          Firestore.instance
-                              .collection("DURGA")
-                              .document(
-                                  (await FirebaseAuth.instance.currentUser())
-                                      .uid)
-                              .collection("Emergency Contacts")
-                              .document()
-                              .setData({
-                                "Name": taskNameInputController.text,
-                                "Number": taskNumberInputController.text,
-                                "Address": taskAddressInputController.text,
+            Row(crossAxisAlignment: CrossAxisAlignment.center, mainAxisAlignment: MainAxisAlignment.center, children: [
+              RaisedButton(
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(30.0),
+                  ),
+                  color: Colors.amber[700],
+                  padding: const EdgeInsets.all(20),
+                  child: Text('Cancel'),
+                  onPressed: () {
+                    taskNameInputController.clear();
+                    taskNumberInputController.clear();
+                    taskAddressInputController.clear();
+                    Navigator.pop(context);
+                  }),
+              SizedBox(width: 80.0),
+              RaisedButton(
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(30.0),
+                  ),
+                  color: Colors.amber[700],
+                  padding: const EdgeInsets.all(20),
+                  child: Text(
+                    'Save',
+                    //style: TextStyle(color: Colors.red[900]),
+                  ),
+                  onPressed: () async {
+                    if (taskNameInputController.text.isNotEmpty &&
+                        (taskNumberInputController.text.isNotEmpty) &&
+                        (taskAddressInputController.text.isNotEmpty)) {
+                      FirebaseFirestore.instance
+                          .collection("DURGA")
+                          .doc(FirebaseAuth.instance.currentUser.uid)
+                          .collection("Emergency Contacts")
+                          .doc()
+                          .set({
+                            "Name": taskNameInputController.text,
+                            "Number": taskNumberInputController.text,
+                            "Address": taskAddressInputController.text,
+                          })
+                          .whenComplete(() => {
+                                //  Navigator.pop(context),
+                                taskNameInputController.clear(),
+                                taskNumberInputController.clear(),
+                                taskAddressInputController.clear(),
                               })
-                              .whenComplete(() => {
-                                    //  Navigator.pop(context),
-                                    taskNameInputController.clear(),
-                                    taskNumberInputController.clear(),
-                                    taskAddressInputController.clear(),
-                                  })
-                              .catchError((err) => print(err));
-                        }
-                      })
-                ]),
+                          .catchError((err) => print(err));
+                    }
+                  })
+            ]),
           ]),
     );
   }
