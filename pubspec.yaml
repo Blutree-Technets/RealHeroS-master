@@ -35,7 +35,7 @@ dependencies:
   audioplayers: ^0.19.0
   background_location: ^0.6.0
   beacon_monitoring: ^2.0.0
-  camera: ^0.8.1+2
+  camera: ^0.8.1+3
   carousel_pro: ^1.0.0
   cloud_firestore: ^2.2.1
   connectivity: ^3.0.6
@@ -48,20 +48,21 @@ dependencies:
   flutter_local_notifications: ^6.0.0
   flutter_phone_direct_caller: ^2.0.0
   flutter_signin_button: ^2.0.0
-  font_awesome_flutter: ^9.0.0
+  font_awesome_flutter: ^9.1.0
   form_field_validator: ^1.1.0
   geoflutterfire: ^3.0.0-nullsafety.4
   geolocator: ^7.0.3
   google_maps_flutter: ^2.0.6
   image_gallery_saver: ^1.6.9
-  image_picker: ^0.8.0+3
+  image_picker: 0.7.4
   intl: ^0.17.0
-  location: ^4.2.2
+  location: ^4.2.3
   overlay_support: ^1.2.1
   path: ^1.8.0
   path_provider: ^2.0.2
   provider: ^5.0.0
   rxdart: ^0.27.1
+  stream_chat_flutter: ^2.0.0-nullsafety.4
   url_launcher: ^6.0.6
   video_player: ^2.1.5
   video_thumbnail: ^0.3.3
